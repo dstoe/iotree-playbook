@@ -1,0 +1,4 @@
+---
+credential: "iotree"
+pi_home: "/home/pi"
+iotree_checkout: "/home/pi/iotree"

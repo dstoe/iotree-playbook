@@ -1,0 +1,56 @@
+---
+- name: Update settings.js - flowFile
+  lineinfile:
+    path: "{{ pi_home }}/.node-red/settings.js"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: "flowFile:"
+      line: "flowFile: '{{ iotree_checkout }}/node-red/iotree-flows.json',"
+    - regexp: "flowFilePretty:"
+      line: "flowFilePretty: true,"
+    - regexp: "credentialSecret:"
+      line: "credentialSecret: '{{ credential }}',"
+  become: no
+
+- name: Restart the node-red service
+  systemd:
+    name: nodered.service
+    state: restarted
+
+- name: Checkout iotree
+  git:
+    repo: "https://github.com/TimeCruiser/iotree.git"
+    dest: "{{ iotree_checkout }}"
+  become: no
+
+- name: Install python environment
+  pip:
+    name:
+      - flask-restful
+      - adafruit-ws2801
+      - RPi.GPIO
+    virtualenv: "{{ iotree_checkout }}/env"
+    virtualenv_command: pyvenv
+  become: no
+
+- name: Give user access to GPIO pins
+  user:
+    name: pi
+    groups: gpio
+    append: yes
+
+- name: Enable SPI
+  shell: "raspi-config nonint do_spi 0"
+
+- name: Add the service
+  template:
+    src: iotree-led.service.j2
+    dest: /lib/systemd/system/iotree-led.service
+
+- name: Enable the service
+  systemd:
+    name: iotree-led.service
+    enabled: yes
+    state: started
+    daemon_reload: yes

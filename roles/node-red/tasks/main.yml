@@ -1,0 +1,12 @@
+---
+- name: Enable node-red service
+  systemd:
+    name: nodered.service
+    state: started
+    enabled: yes
+
+- name: Install node-red dashboard
+  npm:
+    name: node-red-dashboard
+    path: /home/pi/.node-red/
+  become: no

@@ -1,0 +1,14 @@
+---
+hostname: iotree
+package_list:
+  - build-essential
+  - curl
+  - git
+  - htop
+  - python3
+  - python3-pip
+  - python3-setuptools
+  - python3-venv
+  - python3-wheel
+  - tmux
+  - vim
